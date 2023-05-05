@@ -5,6 +5,11 @@ import serial
 # Define the data structure
 data = []
 i=0
+
+# Configure the serial ports 
+#Arduino
+ser = serial.Serial('COM3', 9600, timeout=1)
+
 # Loop to read and store data every second
 while True:
     if i==0:
