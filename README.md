@@ -1,5 +1,5 @@
 # sun_sensor
 keithley, inclinometer and thermistor automated
 
-![SLC3300](./connections/SCL3300.png)
-![Arduino_mega](./connections/Arduino_mega.jpeg)
+![SLC3300](./SCL3300.png)
+![Arduino_mega](./Arduino_mega.jpeg)  

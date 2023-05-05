@@ -2,8 +2,6 @@ import time
 import pandas as pd
 import serial
 
-# Configure the serial port
-ser = serial.Serial('COM3', 9600, timeout=1)
 # Define the data structure
 data = []
 i=0
@@ -13,14 +11,14 @@ while True:
          # Get the current time
         timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
         # Read the sensor data from the Arduino
-        #ser.write(b'r\n')
+        ser.write(b'r\n')
         response = ser.readline()
         print('\n',response,'\n')
 
         time.sleep(1)
         i=i+1
     else:
-        # Get the current time
+        # Get the current timeww
         timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
         # Read the sensor data from the Arduino
         #ser.write(b'r\n')
