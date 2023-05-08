@@ -55,12 +55,11 @@ while True:
         print(current_measured_front,'\t',current_measured_rear)
         #store the data with a timestamp
         data.append([x, y, z,timestamp_front,current_measured_front,timestamp_rear,current_measured_rear])
-        i=i+1
-    elif i>=200:
-        # Save the data to an Excel file
         df = pd.DataFrame(data, columns=['X', 'Y', 'Z','Timestamp Front','Short Circuit Current Front','Timestamp Rear','Short Circuit Current Rear'])
         df.to_excel("experiment_results.xlsx", index=False)
         df.to_csv("experiment_results.csv")
+        i=i+1
+    elif i>=200:
         ser.close()
         sourcemeter.shutdown()
         exit()
