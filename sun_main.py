@@ -9,6 +9,7 @@ import serial
 data = []
 i=0
 no_data_points=20
+I_o=0.01 #Io value in A
 
 # Configure the serial ports 
 #Arduino
@@ -53,12 +54,16 @@ while True:
         sourcemeter.disable_source()
         time.sleep(0.01)
         print(current_measured_front,'\t',current_measured_rear)
+        #calculate expected current
+        current_expected = I_o*np.cos(x*np.pi/180.00)
         #store the data with a timestamp
-        data.append([x, y, z,timestamp_front,current_measured_front,timestamp_rear,current_measured_rear])
-        df = pd.DataFrame(data, columns=['X', 'Y', 'Z','Timestamp Front','Short Circuit Current Front','Timestamp Rear','Short Circuit Current Rear'])
+        data.append([x, y, z,timestamp_front,current_measured_front,timestamp_rear,current_measured_rear,current_expected])
+        df = pd.DataFrame(data, columns=['X', 'Y', 'Z','Timestamp Front','Short Circuit Current Front','Timestamp Rear','Short Circuit Current Rear','Current Expected'])
         df.to_excel("experiment_results.xlsx", index=False)
         df.to_csv("experiment_results.csv")
         i=i+1
+        df.plot(x='X',y=['Short Circuit Current Front', 'Short Circuit Current Rear','Current Expected'],title="Current(A) vs Angle(deg)", xlabel="Angle(deg)", ylabel="Current (A)", legend=(['Short Circuit Current Front', 'Short Circuit Current Rear','Current Expected']))
+
     elif i>=200:
         ser.close()
         sourcemeter.shutdown()
