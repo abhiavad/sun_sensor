@@ -1,58 +1,47 @@
-import time
-import pandas as pd
-import serial
 # Import necessary packages
 from pymeasure.instruments.keithley import Keithley2400
 import numpy as np
 import pandas as pd
-from time import sleep
-# Set the input parameters
-data_points = 50
-averages = 10
-max_current = 0.001
-min_current = -max_current
-# Set source_current and measure_voltage parameters
-current_range = 10e-3 # in Amps
-compliance_voltage = 10 # in Volts
-measure_nplc = 0.1 # Number of power line cycles
-voltage_range = 1 # in VOlts
+import time
+
+#define data structure
+data =[]
+i=0
+no_data_points=10;
+
 # Connect and configure the instrument
 sourcemeter = Keithley2400("ASRL4::INSTR")
+print('\n',sourcemeter.id)
 sourcemeter.reset()
-sourcemeter.use_front_terminals()
-sourcemeter.apply_current(current_range, compliance_voltage)
-sourcemeter.measure_voltage(measure_nplc, voltage_range)
-sleep(0.1) # wait here to give the instrument time to react
-sourcemeter.stop_buffer()
-sourcemeter.disable_buffer()
-# Allocate arrays to store the measurement results
-currents = np.linspace(min_current, max_current, num=data_points)
-voltages = np.zeros_like(currents)
-voltage_stds = np.zeros_like(currents)
-sourcemeter.enable_source()
-# Loop through each current point, measure and record the voltage
-for i in range(data_points):
-    sourcemeter.config_buffer(averages)
-    sourcemeter.source_current = currents[i]
-    sourcemeter.start_buffer()
-    sourcemeter.wait_for_buffer()
-    # Record the average and standard deviation
-    voltages[i] = sourcemeter.means[0]
-    sleep(1.0)
-    voltage_stds[i] = sourcemeter.standard_devs[0]
-# Save the data columns in a CSV file
-    data = pd.DataFrame({
-    'Current (A)': currents,
-    'Voltage (V)': voltages,
-    'Voltage Std (V)': voltage_stds,
-})
-data.to_csv('example.csv')
-sourcemeter.shutdown()
-
-
-# d1=rm.open_resource('ASRL4::INSTR')
-# d1.write_termination = '\r\n'
-# d1.read_termination = '\r\n'
-# d1.baud_rate = 9600
-# d1.query("*IDN?")
-# d1.query("SNAPD?")
+sourcemeter.apply_voltage(voltage_range=0,compliance_current=0.01)
+sourcemeter.measure_current(nplc=1,current=0.01,auto_range=True)
+time.sleep(0.1) # wait here to give the instrument time to react
+#  measure and record the current
+while True:
+    if i<no_data_points:
+        #use front terminals
+        sourcemeter.use_front_terminals()
+        sourcemeter.enable_source()
+        timestamp_front = time.strftime('%Y-%m-%d %H:%M:%S')
+        current_measured_front=float(sourcemeter.current)
+        sourcemeter.disable_source()
+        sourcemeter.beep(frequency=1000000,duration=0.01)
+        time.sleep(0.01)
+        #use rear terminals
+        sourcemeter.use_rear_terminals()
+        sourcemeter.enable_source()
+        timestamp_rear = time.strftime('%Y-%m-%d %H:%M:%S')
+        current_measured_rear=float(sourcemeter.current)
+        sourcemeter.disable_source()
+        sourcemeter.beep(frequency=1000,duration=0.01)
+        time.sleep(0.01)
+        #Record 
+        data.append([timestamp_front,current_measured_front,timestamp_rear,current_measured_rear])
+        # data.append([timestamp_front,current_measured_front])
+        i=i+1;
+    else:
+        sourcemeter.shutdown()
+        df=pd.DataFrame(data, columns=['Timestamp Front','Short Circuit Current Front','Timestamp Rear','Short Circuit Current Rear'])
+        # df=pd.DataFrame(data, columns=['Timestamp Front','Short Circuit Current Front'])
+        df.to_excel("keithley_data.xlsx",index=False)
+        exit()
