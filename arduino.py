@@ -8,7 +8,7 @@ i=0
 
 # Configure the serial ports 
 #Arduino
-ser = serial.Serial('COM3', 9600, timeout=1)
+ser = serial.Serial('COM6', 9600, timeout=1)
 
 # Loop to read and store data every second
 while True:
@@ -18,7 +18,7 @@ while True:
         # Read the sensor data from the Arduino
         ser.write(b'r\n')
         response = ser.readline()
-        print('\n',response,'\n')
+        print('\n',response)
 
         time.sleep(1)
         i=i+1
@@ -28,7 +28,7 @@ while True:
         # Read the sensor data from the Arduino
         #ser.write(b'r\n')
         response = ser.readline().decode("utf-8").strip()
-        print('\n',response,'\n')
+        print('\n',response)
         x, y, z = response.split(',')
         x = float(x)
         y = float(y)
@@ -36,12 +36,13 @@ while True:
         
         i=i+1;
 
-        if x%(0.5)<=0.01 and i<200:
+        if (y%(0.5)<=0.1 or y%(0.5)>0.4) and i<10000:
             #store the data with a timestamp
              data.append([timestamp, x, y, z])
+             print(',',i)
              # Wait for 10 milliseconds before the next reading
              time.sleep(0.01)
-        elif i>=200:
+        elif i>=10000:
             # Save the data to an Excel file
             df = pd.DataFrame(data, columns=['Timestamp', 'X', 'Y', 'Z'])
             df.to_excel("sensor_data.xlsx", index=False)

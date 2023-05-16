@@ -21,16 +21,18 @@ void setup() {
     Serial.println("Murata SCL3300 inclinometer not connected.");
     while(1); //Freeze
   }
-  
+
 }
 
 void loop() {
   if (inclinometer.available()) { //Get next block of data from sensor
+
     Serial.print(inclinometer.getCalculatedAngleX());
     Serial.print(",");
     Serial.print(inclinometer.getCalculatedAngleY());
     Serial.print(",");
     Serial.println(inclinometer.getCalculatedAngleZ());
     delay(10); //Allow a little time to see the output
-  } else inclinometer.reset();
+  } 
+  else inclinometer.reset();
 }
