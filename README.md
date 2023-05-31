@@ -6,6 +6,8 @@ Install Arduino IDE and download the following libraries:
 2) https://github.com/DavidArmstrong/SCL3300
 3) https://www.arduino.cc/reference/en/libraries/sd/
 
+Go the folder of the SimpleKalmanFilter library (usually found at C:\Users\...\Documents\Arduino\libraries\SimpleKalmanFilter), and replace the src folder with the one provided. 
+
 Upload the inclinometer sketch to the arduino and make connections by referring the images included below:
 
 ![SLC3300](./references/SCL3300.png)
