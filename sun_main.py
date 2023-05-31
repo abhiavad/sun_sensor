@@ -11,9 +11,9 @@ data = []
 i=0
 j=0
 no_tot_readings=10000
-no_ang_readings=10
+no_ang_readings=5
 
-I_o=0.01 #Io value in A
+I_o=0.00587 #Io value in A
 
 # Configure the serial ports 
 #Arduino
@@ -25,7 +25,11 @@ time.sleep(1)
 def getLatestAngles():
     while ser.inWaiting() > 0:
         Angles = ser.readline()
+    else:
+        Angles = ser.readline()
     return Angles
+    
+
     
 #Connect and configure the Keithley
 sourcemeter = Keithley2400("ASRL4::INSTR")
@@ -40,12 +44,13 @@ sourcemeter.beep(frequency=100000,duration=1)
 while True:
     # Read the sensor data from the Arduino
     Angles = getLatestAngles().decode("utf-8").strip()
-    x, y, z = Angles.split(',')
+    Tilt, x, y, z = Angles.split(',')
+    Tilt=float(Tilt)
     x = float(x)
     y = float(y)
     z = float(z)
-    
-    if (y%(0.5)>=0.4 or y%(0.5)<=0.1) and i<no_tot_readings and j<no_ang_readings:
+
+    if (Tilt%(0.5)>=0.45 or Tilt%(0.5)<=0.05) and i<no_tot_readings and j<no_ang_readings:
         
         #Timestamp
         timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
@@ -55,7 +60,7 @@ while True:
         sourcemeter.use_front_terminals()
         sourcemeter.enable_source()
         sourcemeter.beep(frequency=1000,duration=0.01)
-        time.sleep(0.1)
+        time.sleep(0.5)
         current_measured_front=float(sourcemeter.current)
         sourcemeter.disable_source()
 
@@ -63,20 +68,20 @@ while True:
         sourcemeter.use_rear_terminals()
         sourcemeter.enable_source()
         sourcemeter.beep(frequency=1000,duration=0.01)
+        time.sleep(0.5)
         current_measured_rear=float(sourcemeter.current)
         sourcemeter.disable_source()
-        time.sleep(0.1)
-
+        
         #calculate expected current
-        current_expected = I_o*np.cos(y*np.pi/180.00)
+        current_expected = I_o*np.cos(Tilt*np.pi/180.00)
 
         #Print for refernce
-        print('\nx:',x,', y:', y,', z:', z,', i:',i,', j:',j,', time:',timestamp,', cur_frnt:',current_measured_front,', cur_bck:',current_measured_rear,', cur_exp:',current_expected)
+        print('\nTilt:',Tilt,', x:',x,', y:',y,', z:',z,', i:',i,', j:',j,', time:',timestamp,', cur_frnt:',current_measured_front,', cur_bck:',current_measured_rear,', cur_exp:',current_expected)
         #store the data with a timestamp
-        data.append([x, y, z,timestamp,current_measured_front,current_measured_rear,current_expected])
-        df = pd.DataFrame(data, columns=['X', 'Y', 'Z','Timestamp','Short Circuit Current Front','Short Circuit Current Rear','Current Expected'])
-        df.to_excel("experiment_results.xlsx", index=False)
-        df.to_csv("experiment_results.csv")
+        data.append([Tilt,x,y,z,timestamp,current_measured_front,current_measured_rear,current_expected])
+        df = pd.DataFrame(data, columns=['Tilt','x','y','z','Timestamp','Short Circuit Current Front','Short Circuit Current Rear','Current Expected'])
+        df.to_excel(".\Results\May30_2023_ADN01_AxisB_1.xlsx", index=False)
+        df.to_csv(".\Results\May30_2023_ADN01_AxisB_1.csv")
         i=i+1
         j=j+1
         # df.plot(x='Y',y=['Short Circuit Current Front', 'Short Circuit Current Rear','Current Expected'],title="Current(A) vs Angle(deg)", xlabel="Angle(deg)", ylabel="Current (A)", legend=(['Short Circuit Current Front', 'Short Circuit Current Rear','Current Expected']))
@@ -90,8 +95,9 @@ while True:
         time.sleep(1)
         j=0
     else:
-        print('\nx:',x,', y:', y,', z:', z,', i:',i,', j:',j)
+        print('\nTilt', Tilt,', x:',x,', y:',y,', z:',z,', i:',', i:',i,', j:',j)
         time.sleep(0.1)
+        j=0
 
         
 
