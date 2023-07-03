@@ -13,7 +13,7 @@ j=0 #number of readings at current angle
 no_tot_readings=10000
 no_ang_readings=5
 
-I_o=0.00587 #Io value in A (short circuit current at 0 degrees, check and set it before testing)
+I_o=5.87 #Io value in mA (short circuit current at 0 degrees, check and set it before testing)
 
 # Configure the serial ports 
 #Arduino
@@ -64,7 +64,7 @@ while True:
         sourcemeter.enable_source()
         sourcemeter.beep(frequency=1000,duration=0.01)
         time.sleep(0.5)
-        current_measured_front=float(sourcemeter.current)
+        current_measured_front=float(sourcemeter.current)*1000
         sourcemeter.disable_source()
 
         #use rear terminals for redundant cell
@@ -72,7 +72,7 @@ while True:
         sourcemeter.enable_source()
         sourcemeter.beep(frequency=1000,duration=0.01)
         time.sleep(0.5)
-        current_measured_rear=float(sourcemeter.current)
+        current_measured_rear=float(sourcemeter.current)*1000
         sourcemeter.disable_source()
         
         #calculate expected current using Io value
