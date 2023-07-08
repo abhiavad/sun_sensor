@@ -13,7 +13,7 @@ j=0 #number of readings at current angle
 no_tot_readings=10000
 no_ang_readings=5
 
-I_o=5.87 #Io value in mA (short circuit current at 0 degrees, check and set it before testing)
+I_o=5.93 #Io value in mA (short circuit current at 0 degrees, check and set it before testing)
 
 # Configure the serial ports 
 #Arduino
@@ -32,7 +32,7 @@ def getLatestAngles():
 
     
 #Connect and configure the Keithley
-sourcemeter = Keithley2400("ASRL5::INSTR") #Check this at device manager and set it accordingly 
+sourcemeter = Keithley2400("ASRL4::INSTR") #Check this at device manager and set it accordingly 
 print('\n',sourcemeter.id)
 sourcemeter.reset()
 sourcemeter.apply_voltage(voltage_range=0,compliance_current=0.01)
@@ -82,11 +82,11 @@ while True:
         print('\nTilt:',Tilt,', x:',x,', y:',y,', z:',z,', i:',i,', j:',j,', time:',timestamp,', cur_frnt:',current_measured_front,', cur_bck:',current_measured_rear,', cur_exp:',current_expected)
         #store the data with a timestamp
         data.append([Tilt,x,y,z,timestamp,current_measured_front,current_measured_rear,current_expected])
-        df = pd.DataFrame(data, columns=['Tilt (deg.)','x (deg.)','y (deg.)','z (deg.)','Timestamp','Short Circuit Current Primary (A)','Short Circuit Current Redundant (A)','Current Expected (A)'])
+        df = pd.DataFrame(data, columns=['Tilt (deg.)','x (deg.)','y (deg.)','z (deg.)','Timestamp','Short Circuit Current Primary (mA)','Short Circuit Current Redundant (mA)','Current Expected (mA)'])
         
         #RESET THIS AFTER EVERY SET OF READINGS TO NOT OVERWRITE PREVIOUS READINGS
-        df.to_excel(".\Results\May30_2023_ADN01_AxisA_1.xlsx", index=False) 
-        df.to_csv(".\Results\May30_2023_ADN01_AxisA_1.csv")
+        df.to_excel(".\Results\july07_2023_ADN05_AxisB_2.xlsx", index=False) 
+        df.to_csv(".\Results\july07_2023_ADN05_AxisB_2.csv")
         
         # df.plot(x='Y',y=['Short Circuit Current Front', 'Short Circuit Current Rear','Current Expected'],title="Current(A) vs Angle(deg)", xlabel="Angle(deg)", ylabel="Current (A)", legend=(['Short Circuit Current Front', 'Short Circuit Current Rear','Current Expected']))
     
